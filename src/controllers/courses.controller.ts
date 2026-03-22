@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import { connection } from "../database/connection";
+import { createCourseService, deleteCourseService, getAllCourses, getCourseByIdService, updateCourseService } from "../services/courses.service";
 
 
 export async function getCourses(req: Request, res: Response) {
     try {
-        const [rows] = await (connection as any).query("SELECT * FROM courses");
-        return res.json(rows)
+        const courses = await getAllCourses();
+        return res.json(courses)
     } catch(error) {
         console.error(error);
-        return res.status(500).json({ message: "Error searching for courses"})
+        return res.status(500).json({ message: "Error fetching courses"})
     }
 }
 
@@ -16,16 +17,13 @@ export async function getCourseById(req: Request, res: Response) {
     const id = Number(req.params.id);
     
     try {
-        const [rows]: any = await (connection as any).query(
-            "SELECT * FROM courses WHERE id = ?",
-            [id]
-        );
+        const course = await getCourseByIdService(id);
 
-        if (rows.length === 0) {
+        if (!course) {
             return res.status(404).json({ message: "Course not found!" });
         }
 
-        return res.json(rows[0]);
+        return res.json(course);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error searching for course" });
@@ -40,13 +38,7 @@ export async function createCourse(req: Request, res: Response) {
     }
 
     try {
-        const [result]: any = await (connection as any).execute(
-            "INSERT INTO courses (title) VALUES (?)",
-            [title]
-        );
-
-        // result.insertId contém o ID gerado pelo AUTO_INCREMENT
-        const newCourse = { id: result.insertId, title };
+        const newCourse =  await createCourseService(title);
         return res.status(201).json(newCourse);
     } catch (error) {
         console.error(error);
@@ -63,19 +55,16 @@ export async function updateCourse(req: Request, res: Response) {
     }
 
     try {
-        const [result]: any = await (connection as any).execute(
-            "UPDATE courses SET title = ? WHERE id = ?",
-            [title, id]
-        );
+        const updated = await updateCourseService(id, title);
 
-        if (result.affectedRows === 0) {
+        if (!updated) {
             return res.status(404).json({ message: "Course not found!" });
         }
 
-        return res.json({ id, title });
+        return res.json(updated);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error updating" });
+        return res.status(500).json({ message: "Error updating course" });
     }
 }
 
@@ -84,16 +73,13 @@ export async function deleteCourse(req: Request, res: Response) {
 
     
     try {
-        const [result]: any = await (connection as any).execute(
-            "DELETE FROM courses WHERE id = ?",
-            [id]
-        );
+        const deleted = await deleteCourseService(id)
 
-        if (result.affectedRows === 0) {
+        if (!deleted) {
             return res.status(404).json({ message: "Course not found!" });
         }
 
-        return res.json({ message: "Course deleted!" });
+        return res.json({message: "Course deleted!"})
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error deleting course" });
