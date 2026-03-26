@@ -1,87 +1,70 @@
 import { Request, Response } from "express";
-import { connection } from "../database/connection";
-import { createCourseService, deleteCourseService, getAllCourses, getCourseByIdService, updateCourseService } from "../services/courses.service";
+import { createCourseService, 
+         deleteCourseService, 
+         getAllCourses, 
+         getCourseByIdService, 
+         updateCourseService } from "../services/courses.service";
+import { createError } from "../utils/error";
 
 
 export async function getCourses(req: Request, res: Response) {
-    try {
-        const courses = await getAllCourses();
-        return res.json(courses)
-    } catch(error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error fetching courses"})
-    }
+    const courses = await getAllCourses();
+    return res.json(courses)
 }
 
 export async function getCourseById(req: Request, res: Response) {
     const id = Number(req.params.id);
-    
-    try {
-        const course = await getCourseByIdService(id);
 
-        if (!course) {
-            return res.status(404).json({ message: "Course not found!" });
-        }
-
-        return res.json(course);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error searching for course" });
+    if (isNaN(id)) {
+        throw createError("Invalid ID", 400);
     }
+    
+    const course = await getCourseByIdService(id);
+
+    if (!course) {
+        throw createError("Course not found", 404);
+    }
+
+    return res.json(course);
 }
 
 export async function createCourse(req: Request, res: Response) {
     const { title } = req.body;
 
-    if (!title) {
-    return res.status(400).json({ message: "Title is required" });
-    }
+    const newCourse =  await createCourseService(title);
 
-    try {
-        const newCourse =  await createCourseService(title);
-        return res.status(201).json(newCourse);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error creating course" });
-    }
+    return res.status(201).json(newCourse);
 }
 
 export async function updateCourse(req: Request, res: Response) {
     const { title } = req.body;    
     const id = Number(req.params.id);
 
-    if (!title) {
-    return res.status(400).json({ message: "Title is required" });
+    if (isNaN(id)) {
+        throw createError("Invalid ID", 400);
     }
 
-    try {
-        const updated = await updateCourseService(id, title);
+    const updated = await updateCourseService(id, title);
 
-        if (!updated) {
-            return res.status(404).json({ message: "Course not found!" });
-        }
-
-        return res.json(updated);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error updating course" });
+    if (!updated) {
+        throw createError("Course not found", 404)
     }
+
+    return res.json(updated);
 }
 
 export async function deleteCourse(req: Request, res: Response) {
-   const id = Number(req.params.id);
+    const id = Number(req.params.id);
 
-    
-    try {
-        const deleted = await deleteCourseService(id)
-
-        if (!deleted) {
-            return res.status(404).json({ message: "Course not found!" });
-        }
-
-        return res.json({message: "Course deleted!"})
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error deleting course" });
+    if (isNaN(id)) {
+        throw createError("Invalid ID", 400);
     }
+
+    const deleted = await deleteCourseService(id);
+
+    if (!deleted) {
+        throw createError("Course not found", 404);
+    }
+
+    return res.json({ message: "Course deleted" });
 }
