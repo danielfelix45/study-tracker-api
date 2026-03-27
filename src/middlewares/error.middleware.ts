@@ -6,10 +6,13 @@ export function errorHandler(
     res: Response,
     next: NextFunction 
 ) {
+    if (process.env.NODE_ENV !== "test") {
     console.error(err);
+}
 
     return res.status(err.status || 500).json({
         status: "error",
-        message: err.message || "Internal server error"
+        message: err.message || "Internal server error",
+        ...(err.details && { details: err.details })
     });
 }
