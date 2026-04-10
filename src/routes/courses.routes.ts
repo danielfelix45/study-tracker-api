@@ -2,6 +2,7 @@ import {Router} from "express";
 import * as coursesController from "../controllers/courses.controller";
 import { validate } from "../middlewares/validate.middleware";
 import { createCourseSchema, updateCourseSchema } from "../schemas/course.schema";
+import { authMiddleware } from "../modules/auth/auth.middleware";
 
 
 const router = Router();
@@ -15,7 +16,7 @@ const router = Router();
  *       200:
  *         description: List of courses
  */
-router.get('/courses', coursesController.getCourses);
+router.get('/courses', authMiddleware, coursesController.getCourses);
 
 /**
  * @swagger
@@ -35,7 +36,7 @@ router.get('/courses', coursesController.getCourses);
  *       404:
  *         description: Course not found
  */
-router.get('/courses/:id', coursesController.getCourseById);
+router.get('/courses/:id', authMiddleware, coursesController.getCourseById);
 /**
  * @swagger
  * /courses:
@@ -55,7 +56,7 @@ router.get('/courses/:id', coursesController.getCourseById);
  *       201:
  *         description: Course created
  */
-router.post('/courses', validate(createCourseSchema), coursesController.createCourse);
+router.post('/courses', authMiddleware, validate(createCourseSchema), coursesController.createCourse);
 
 /**
  * @swagger
@@ -84,7 +85,7 @@ router.post('/courses', validate(createCourseSchema), coursesController.createCo
  *       404:
  *         description: Course not found
  */
-router.put('/courses/:id', validate(updateCourseSchema), coursesController.updateCourse);
+router.put('/courses/:id', authMiddleware, validate(updateCourseSchema), coursesController.updateCourse);
 
 /**
  * @swagger
@@ -103,7 +104,7 @@ router.put('/courses/:id', validate(updateCourseSchema), coursesController.updat
  *       404:
  *         description: Course not found
  */
-router.delete('/courses/:id', coursesController.deleteCourse);
+router.delete('/courses/:id', authMiddleware, coursesController.deleteCourse);
 
 
 export default router;
