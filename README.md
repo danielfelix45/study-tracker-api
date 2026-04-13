@@ -63,8 +63,9 @@ src/
 
 ### 1. Clonar o repositório
 
-````bash
+```bash
 git clone <https://github.com/danielfelix45/study-tracker-api>
+```
 
 ---
 
@@ -72,6 +73,7 @@ git clone <https://github.com/danielfelix45/study-tracker-api>
 
 ```bash
 npm install
+```
 
 ---
 
@@ -82,6 +84,7 @@ Crie um arquivo .env:
 ```env
 PORT=3000
 JWT_SECRET=sua_chave_secreta
+```
 
 ---
 
@@ -89,14 +92,15 @@ JWT_SECRET=sua_chave_secreta
 
 Crie um banco MYSQL:
 
-````
-
+```
 study_tracker
+```
 
 E configure a conexão em:
 
-````
+```
 src/database/connection.ts
+```
 
 ---
 
@@ -104,6 +108,7 @@ src/database/connection.ts
 
 ```bash
 npm run dev
+```
 
 ---
 
@@ -115,12 +120,13 @@ A API utiliza JWT para autenticação.
 
 ```http
 POST /auth/login
+```
 
 ### Uso do token:
 
-````
-
+```
 Authorization: Bearer SEU_TOKEN
+```
 
 ---
 
@@ -128,8 +134,9 @@ Authorization: Bearer SEU_TOKEN
 
 Acesse no navegador:
 
-````
+```
 http://localhost:3000/docs
+```
 
 ---
 
@@ -137,6 +144,7 @@ http://localhost:3000/docs
 
 ```bash
 npx jest
+```
 
 ---
 
@@ -164,4 +172,3 @@ Este projeto foi desenvolvido com o objetivo de praticar desenvolvimento backend
 ### 👨‍💻 Autor
 
 Desenvolvido por Félix
-````
